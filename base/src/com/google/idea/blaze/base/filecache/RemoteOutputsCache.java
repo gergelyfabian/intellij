@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.idea.blaze.base.async.FutureUtil;
 import com.google.idea.blaze.base.command.buildresult.RemoteOutputArtifact;
 import com.google.idea.blaze.base.ideinfo.ArtifactLocation;
 import com.google.idea.blaze.base.ideinfo.TargetIdeInfo;
@@ -33,8 +34,10 @@ import com.google.idea.blaze.base.ideinfo.TargetMap;
 import com.google.idea.blaze.base.model.OutputsProvider;
 import com.google.idea.blaze.base.model.RemoteOutputArtifacts;
 import com.google.idea.blaze.base.prefetch.FetchExecutor;
+import com.google.idea.blaze.base.prefetch.RemoteArtifactPrefetcher;
 import com.google.idea.blaze.base.scope.BlazeContext;
 import com.google.idea.blaze.base.scope.output.IssueOutput;
+import com.google.idea.blaze.base.scope.scopes.TimingScope.EventType;
 import com.google.idea.blaze.base.settings.BlazeImportSettings;
 import com.google.idea.blaze.base.settings.BlazeImportSettingsManager;
 import com.google.idea.blaze.base.sync.data.BlazeDataStorage;
@@ -61,6 +64,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
@@ -162,6 +166,13 @@ public final class RemoteOutputsCache {
           return;
         }
       }
+      ListenableFuture<?> prefetchFuture =
+          RemoteArtifactPrefetcher.getInstance()
+              .prefetchFiles(cacheDir, updatedOutputs.values(), false);
+      FutureUtil.waitForFuture(context, prefetchFuture)
+          .timed("PrefetchRemoteOutput", EventType.Prefetching)
+          .withProgressMessage("Prefetching output artifacts...")
+          .run();
 
       List<ListenableFuture<?>> futures = new ArrayList<>(copyLocally(updatedOutputs));
       futures.addAll(deleteCacheFiles(removed));
@@ -183,7 +194,18 @@ public final class RemoteOutputsCache {
   }
 
   private Map<String, File> readCachedFiles() {
-    File[] files = cacheDir.listFiles();
+    File[] files =
+        cacheDir.listFiles(
+            file -> {
+              if (file.isDirectory()
+                  || (file.getPath().contains("/objfs/")
+                      && (System.currentTimeMillis() - file.lastModified())
+                          <= TimeUnit.DAYS.toMillis(1))) {
+                return false;
+              }
+              return true;
+            });
+
     if (files == null) {
       return ImmutableMap.of();
     }
@@ -210,7 +232,7 @@ public final class RemoteOutputsCache {
     return builder.toString();
   }
 
-  private static File getCacheDir(Project project) {
+  public static File getCacheDir(Project project) {
     BlazeImportSettings importSettings =
         BlazeImportSettingsManager.getInstance(project).getImportSettings();
     return new File(BlazeDataStorage.getProjectDataDir(importSettings), "remoteOutputCache");
