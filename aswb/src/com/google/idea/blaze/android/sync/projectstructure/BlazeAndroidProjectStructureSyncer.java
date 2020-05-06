@@ -65,6 +65,7 @@ import com.google.idea.blaze.java.AndroidBlazeRules;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.StdModuleTypes;
@@ -421,7 +422,10 @@ public class BlazeAndroidProjectStructureSyncer {
           resources,
           configAndroidJava8Libs);
       String modulePackage = androidIdeInfo.getResourceJavaPackage();
-      rClassBuilder.addRClass(modulePackage, module);
+      ReadAction.run(
+          () -> {
+            rClassBuilder.addRClass(modulePackage, module);
+          });
       sourcePackages.remove(modulePackage);
     }
 
