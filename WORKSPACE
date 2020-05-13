@@ -28,8 +28,8 @@ http_archive(
 http_archive(
     name = "intellij_ce_2020_1",
     build_file = "@//intellij_platform_sdk:BUILD.idea201",
-    sha256 = "396f0045a713f224015c082924fc5c71be0e029effa2fd7bd3fa65632a55a18c",
-    url = "https://download.jetbrains.com/idea/ideaIC-201.4515.24.tar.gz",
+    sha256 = "b340a1cfdd77d52325b3b775fa880ded62e0826c72ad126d8cb2a6e7b8460461",
+    url = "https://download.jetbrains.com/idea/ideaIC-2020.1.1.tar.gz",
 )
 
 # The plugin api for IntelliJ UE 2019.2. This is required to run UE-specific
@@ -55,8 +55,8 @@ http_archive(
 http_archive(
     name = "intellij_ue_2020_1",
     build_file = "@//intellij_platform_sdk:BUILD.ue201",
-    sha256 = "0944d1b15e6d8d8c13e33ed0bb43773bf7a2cd2100a679c2a668d543a7931de8",
-    url = "https://download-cf.jetbrains.com/idea/ideaIU-201.4515.24.tar.gz",
+    sha256 = "ca485decf8b91549a1c8e20309a7a7b6a7e032ff96e10fde2ff5dbae9e0108e3",
+    url = "https://download.jetbrains.com/idea/ideaIU-2020.1.1.tar.gz",
 )
 
 # The plugin api for CLion 2019.2. This is required to build CLwB,
