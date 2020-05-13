@@ -30,11 +30,16 @@ public final class ScalaBlazeRules implements Kind.Provider {
   /** Scala-specific blaze rule types. */
   public enum RuleTypes {
     SCALA_BINARY("scala_binary", LanguageClass.SCALA, RuleType.BINARY),
+    SCALAFMT_SCALA_BINARY("scalafmt_scala_binary", LanguageClass.SCALA, RuleType.BINARY),
     SCALA_IMPORT("scala_import", LanguageClass.SCALA, RuleType.UNKNOWN),
     SCALA_LIBRARY("scala_library", LanguageClass.SCALA, RuleType.LIBRARY),
+    SCALAFMT_SCALA_LIBRARY("scalafmt_scala_library", LanguageClass.SCALA, RuleType.LIBRARY),
     SCALA_MACRO_LIBRARY("scala_macro_library", LanguageClass.SCALA, RuleType.LIBRARY),
+    SCALAFMT_SCALA_MACRO_LIBRARY("scalafmt_scala_macro_library", LanguageClass.SCALA, RuleType.LIBRARY),
     SCALA_TEST("scala_test", LanguageClass.SCALA, RuleType.TEST),
-    SCALA_JUNIT_TEST("scala_junit_test", LanguageClass.SCALA, RuleType.TEST);
+    SCALAFMT_SCALA_TEST("scalafmt_scala_test", LanguageClass.SCALA, RuleType.TEST),
+    SCALA_JUNIT_TEST("scala_junit_test", LanguageClass.SCALA, RuleType.TEST),
+    SCALAFMT_SCALA_JUNIT_TEST("scalafmt_scala_junit_test", LanguageClass.SCALA, RuleType.TEST);
 
     private final String name;
     private final LanguageClass languageClass;
