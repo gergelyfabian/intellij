@@ -111,6 +111,7 @@ public final class BlazeJavaWorkspaceImporter {
   public BlazeJavaImportResult importWorkspace(BlazeContext context) {
     WorkspaceBuilder workspaceBuilder = new WorkspaceBuilder();
     for (TargetIdeInfo target : sourceFilter.sourceTargets) {
+      context.output(PrintOutput.log("Adding Java target: " + target));
       addTargetAsSource(
           workspaceBuilder, target, sourceFilter.targetToJavaSources.get(target.getKey()));
     }
