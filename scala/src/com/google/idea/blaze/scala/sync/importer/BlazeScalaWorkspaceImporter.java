@@ -30,6 +30,7 @@ import com.google.idea.blaze.base.targetmaps.TransitiveDependencyMap;
 import com.google.idea.blaze.java.sync.importer.JavaSourceFilter;
 import com.google.idea.blaze.java.sync.model.BlazeJarLibrary;
 import com.google.idea.blaze.scala.sync.model.BlazeScalaImportResult;
+import com.google.idea.blaze.base.scope.BlazeContext;
 import com.intellij.openapi.project.Project;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public final class BlazeScalaWorkspaceImporter {
     this.targetMap = targetMap;
   }
 
-  public BlazeScalaImportResult importWorkspace() {
+  public BlazeScalaImportResult importWorkspace(BlazeContext context) {
     ProjectViewTargetImportFilter importFilter =
         new ProjectViewTargetImportFilter(
             Blaze.getBuildSystem(project), workspaceRoot, projectViewSet);
@@ -65,6 +66,10 @@ public final class BlazeScalaWorkspaceImporter {
             .filter(importFilter::isSourceTarget)
             .map(TargetIdeInfo::getKey)
             .collect(Collectors.toList());
+
+    for (TargetKey target : scalaSourceTargets) {
+      context.output(com.google.idea.blaze.base.scope.output.PrintOutput.log("Adding Scala target: " + target));
+    }
 
     Map<LibraryKey, BlazeJarLibrary> libraries = Maps.newHashMap();
 
